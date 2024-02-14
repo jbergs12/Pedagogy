@@ -1,0 +1,39 @@
+---
+title: "Pedagogy Exam"
+author: "Anna Wolford, Aaron Oustrich, Josh Bergstrom"
+format: pdf
+editor: visual
+---
+
+```{r}
+library(vroom)
+library(tidyverse)
+library(corrplot)
+library(MASS)
+library(nlme)
+source("predictgls.R")
+```
+
+```{r}
+ped <- vroom("ClassAssessment.txt")
+ped$Semester <- as.factor(ped$Semester)
+```
+
+```{r}
+summary(ped)
+
+# ped |> 
+#   ggplot(aes(y = Final)) +
+#   geom_boxplot(aes(x = Exam1)) +
+#   geom_boxplot(aes(x = Exam2)) +
+#   geom_boxplot(aes(x = Exam3))
+
+ped |> 
+  ggplot(aes(y = Final)) +
+  geom_boxplot(aes(x = Semester))
+
+ped |> 
+  ggplot(aes(y = Final)) +
+  geom_point(aes(x = Exam1, color = Semester))
+```
+
