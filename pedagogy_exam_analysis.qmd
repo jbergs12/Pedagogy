@@ -14,6 +14,26 @@ library(nlme)
 source("predictgls.R")
 ```
 
+```{r}
+
+
+data <- data.frame(
+  Variable_Name = c("Semester", "NStudents", "Exam1", "Exam2", "Exam3", "HW", "Quiz", "Final"),
+  Description = c("The semester when the course was given (note there were multiple sections per semester)",
+                  "The number of students who completed the course",
+                  "The average score (in percent) on Exam 1",
+                  "The average score (in percent) on Exam 2",
+                  "The average score (in percent) on Exam 3",
+                  "The average score (in percent) on the homework",
+                  "The average score (in percent) on class quizzes",
+                  "The average score (in percent) on the final exam")
+)
+
+knitr::kable(data, align = "l", format = "markdown", col.names = c("Variable Name", "Description")) %>%
+  gsub("\\|", "|_", ., fixed = TRUE)
+
+```
+
 ```{r message=FALSE}
 ped <- vroom("ClassAssessment.txt")
 ped$Semester <- as.factor(ped$Semester)
@@ -21,7 +41,7 @@ ped$Semester <- as.factor(ped$Semester)
 
 ```{r}
 summary(ped)
-
+knitr::kable(summary(ped), align = "l", format = "markdown")
 # ped |> 
 #   ggplot(aes(y = Final)) +
 #   geom_boxplot(aes(x = Exam1)) +
@@ -45,7 +65,9 @@ ped |>
   geom_point(aes(x = Exam1, color = Semester))
 ```
 
+
 # Basic lm model
+
 ```{r}
 ped.lm <- lm(Final ~ .  , data = ped)
 summary(ped.lm)
@@ -110,6 +132,7 @@ The KS-test outputs a large p-value (meaning we have insufficient evidence to sa
 
 ### Equal Variance
 
+
 ```{r message=FALSE}
 ggplot(data = data.frame(residual = resid(ped.gls, type="pearson")),
        aes(x = residual,
@@ -126,9 +149,11 @@ lmtest::bptest((resid(ped.gls, type="pearson"))^2 ~ fitted(ped.gls))
 
 The BP-test outputs a large p-value, and the scatter plot of fitted v. standardized residuals appears to have constant variance. This assumption is now met.
 
+
 # Cross Validation 
 
 ## Leave One Out
+
 ```{r}
 n <- nrow(ped)
 rpmse <- rep(x=NA, times=n)
@@ -174,7 +199,9 @@ for(i in 1:n){
 }
 ```
 
+
 ## CV Results
+
 ```{r}
 # RPMSE
 hist(rpmse, main="RPMSE Histogram", xlab="RPMSE")
