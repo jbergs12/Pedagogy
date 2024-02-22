@@ -14,6 +14,26 @@ library(nlme)
 source("predictgls.R")
 ```
 
+```{r}
+
+
+data <- data.frame(
+  Variable_Name = c("Semester", "NStudents", "Exam1", "Exam2", "Exam3", "HW", "Quiz", "Final"),
+  Description = c("The semester when the course was given (note there were multiple sections per semester)",
+                  "The number of students who completed the course",
+                  "The average score (in percent) on Exam 1",
+                  "The average score (in percent) on Exam 2",
+                  "The average score (in percent) on Exam 3",
+                  "The average score (in percent) on the homework",
+                  "The average score (in percent) on class quizzes",
+                  "The average score (in percent) on the final exam")
+)
+
+knitr::kable(data, align = "l", format = "markdown", col.names = c("Variable Name", "Description")) %>%
+  gsub("\\|", "|_", ., fixed = TRUE)
+
+```
+
 ```{r message=FALSE}
 ped <- vroom("ClassAssessment.txt")
 ped$Semester <- as.factor(ped$Semester)
@@ -21,7 +41,7 @@ ped$Semester <- as.factor(ped$Semester)
 
 ```{r}
 summary(ped)
-
+knitr::kable(summary(ped), align = "l", format = "markdown")
 # ped |> 
 #   ggplot(aes(y = Final)) +
 #   geom_boxplot(aes(x = Exam1)) +
@@ -44,7 +64,6 @@ ped |>
   ggplot(aes(y = Final)) +
   geom_point(aes(x = Exam1, color = Semester))
 ```
-
 
 ```{r}
 ped.lm <- lm(Final ~ .  , data = ped)
@@ -74,6 +93,7 @@ ped.gls <- gls(model=Final~. ,
 
 summary(ped.gls)
 ```
+
 ## Check assumptions
 
 #### Linearity
@@ -105,8 +125,6 @@ ks.test(resid(ped.gls, type="pearson"), "pnorm")
 
 The KS-test outputs a large p-value (meaning we have insufficient evidence to say anything except that residuals are normally distributed), and the histogram looks approximately normal. This assumption is met.
 
-
-
 #### Equal Variance
 
 ```{r message=FALSE}
@@ -124,8 +142,6 @@ lmtest::bptest((resid(ped.gls, type="pearson"))^2 ~ fitted(ped.gls))
 ```
 
 The BP-test outputs a large p-value, and the scatter plot of fitted v. standardized residuals appears to have constant variance. This assumption is now met.
-
-
 
 ### Leave-one-out Cross Validation
 
@@ -173,7 +189,6 @@ for(i in 1:n){
   
 }
 ```
-
 
 ```{r}
 # RPMSE
@@ -228,8 +243,6 @@ ggplot() +
             color="red", linetype="dashed") #Upper bound
 ```
 
-
-
 # Hypothesis Testing and Confidence Intervals under Heteroskedasticity
 
 # RESEARCH Q 1: Effect of activites? Everything is significant except for Quiz
@@ -243,9 +256,11 @@ summary(ped.gls)$sigma # estimate of s
 
 
 ```
-IT appears that the significant factors are Exam 3 and Exam 2. 
+
+IT appears that the significant factors are Exam 3 and Exam 2.
 
 *Carry out a hypothesis test that beta_Quiz=0 . Carry out a hypothesis test that beta_HW=0 Report the p -value and draw an appropriate conclusion.*
+
 ```{r}
 a <- matrix(c(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1), nrow=1)
 summary(multcomp::glht(ped.gls, linfct=a, rhs=0))
@@ -253,21 +268,20 @@ summary(multcomp::glht(ped.gls, linfct=a, rhs=0))
 hw <- matrix(c(0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0), nrow=1)
 summary(multcomp::glht(ped.gls, linfct=hw, rhs=0))
 ```
-Because of a nonsignificant p value, we fail to reject the null that Beta_Quiz = 0. Therefore Quiz does not have a significant effect in our model. 
 
-
-
+Because of a nonsignificant p value, we fail to reject the null that Beta_Quiz = 0. Therefore Quiz does not have a significant effect in our model.
 
 Construct a 95% confidence interval for beta_Exam3 and beta_Exam2.
+
 ```{r}
 confint(ped.gls, level = 0.95)
 confint(ped.gls, level = 0.95)[13,] ## Exam 2
 confint(ped.gls, level = 0.95)[14,] ## Exam 3
 ```
 
-## RESEARCH Q NUM 4: 
-Historically, were there any semesters that had either better or worse student learning than average?
-Were there any semesters that were significantly different than another semester? 
+## RESEARCH Q NUM 4:
+
+Historically, were there any semesters that had either better or worse student learning than average? Were there any semesters that were significantly different than another semester?
 
 Does semester1=semester2=....=semester10? Hypothesis test...
 
@@ -286,5 +300,5 @@ ped %>%
 semester <- matrix(c(0,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0), nrow=1)
 summary(multcomp::glht(ped.gls, linfct=semester, rhs=0))
 ```
-WIth a p value of 0.426 fail to reject there is a statistically significant semester... blah 
 
+WIth a p value of 0.426 fail to reject there is a statistically significant semester... blah
