@@ -65,6 +65,9 @@ ped |>
   geom_point(aes(x = Exam1, color = Semester))
 ```
 
+
+# Basic lm model
+
 ```{r}
 ped.lm <- lm(Final ~ .  , data = ped)
 summary(ped.lm)
@@ -85,18 +88,20 @@ ped |>
 lmtest::bptest(ped.lm)
 ```
 
+# GLS model
 ```{r}
+
 ped.gls <- gls(model=Final~. ,
     data=ped,
-    weights=varFixed(~NStudents),
+    weights=varFixed(~1/NStudents),
     method="ML")
 
 summary(ped.gls)
 ```
 
-## Check assumptions
+# GLS assumptions
 
-#### Linearity
+### Linearity
 
 ```{r}
 car::avPlots(ped.lm)
@@ -104,11 +109,11 @@ car::avPlots(ped.lm)
 
 The only added-variable plot between Income and EatingOut appears linear. This assumption is met.
 
-#### Independence
+### Independence
 
 It's likely safe to assume that the 523 households from this survey were randomly selected, but since it doesn't specify that they were, we must examine the data more deeply. Since the average weekly expenditure on ped not cooked at home for a family does not usually depend on the average weekly expenditure on ped not cooked at home of another family, we can assume these responses are independent. This assumption is met.
 
-#### Normality
+### Normality
 
 ```{r message=FALSE}
 ggplot(data = data.frame(residual = resid(ped.gls, type="pearson")),
@@ -125,7 +130,8 @@ ks.test(resid(ped.gls, type="pearson"), "pnorm")
 
 The KS-test outputs a large p-value (meaning we have insufficient evidence to say anything except that residuals are normally distributed), and the histogram looks approximately normal. This assumption is met.
 
-#### Equal Variance
+### Equal Variance
+
 
 ```{r message=FALSE}
 ggplot(data = data.frame(residual = resid(ped.gls, type="pearson")),
@@ -143,7 +149,10 @@ lmtest::bptest((resid(ped.gls, type="pearson"))^2 ~ fitted(ped.gls))
 
 The BP-test outputs a large p-value, and the scatter plot of fitted v. standardized residuals appears to have constant variance. This assumption is now met.
 
-### Leave-one-out Cross Validation
+
+# Cross Validation 
+
+## Leave One Out
 
 ```{r}
 n <- nrow(ped)
@@ -165,7 +174,7 @@ for(i in 1:n){
   ## Fit a lm() using the training data
   train.gls <- gls(model=Final~. ,
     data=train.set,
-    weights=varFixed(~NStudents),
+    weights=varFixed(~1/NStudents),
     method="ML")
   
   ## Generate predictions for the test set
@@ -189,6 +198,9 @@ for(i in 1:n){
   
 }
 ```
+
+
+## CV Results
 
 ```{r}
 # RPMSE
@@ -216,6 +228,7 @@ hist(wid, main="Width Histogram", xlab="Width")
 mean(wid)
 ```
 
+## CV Prediction Plots
 ```{r}
 dataPreds <- predictgls(glsobj=ped.gls, level=0.95, newdframe=ped)
 ggplot() + 
@@ -230,16 +243,16 @@ ggplot() +
             mapping=aes(x=Exam3, y=upr), 
             color="red", linetype="dashed") #Upper bound
 
-ggplot() + 
-  geom_point(data=dataPreds, 
+ggplot() +
+  geom_point(data=dataPreds,
              mapping=aes(x=Exam2, y=Final)) + #Scatterplot
-  geom_line(data=dataPreds, 
+  geom_line(data=dataPreds,
             mapping=aes(x=Exam2, y=Prediction)) + #Prediction Line
-  geom_line(data=dataPreds, 
-            mapping=aes(x=Exam2, y=lwr), 
+  geom_line(data=dataPreds,
+            mapping=aes(x=Exam2, y=lwr),
             color="red", linetype="dashed") + #lwr bound
-  geom_line(data=dataPreds, 
-            mapping=aes(x=Exam2, y=upr), 
+  geom_line(data=dataPreds,
+            mapping=aes(x=Exam2, y=upr),
             color="red", linetype="dashed") #Upper bound
 ```
 
