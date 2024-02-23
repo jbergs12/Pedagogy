@@ -256,9 +256,21 @@ ggplot() +
             color="red", linetype="dashed") #Upper bound
 ```
 
+
+```{r}
+final_rmse <- mean(sum((dataPreds$Prediction - ped$Final)^2))
+
+# try MAE?
+```
+
+
+We are also confident that our model accurately predicts values. By using a Leave-one-out Cross-Validation Method, the prediction intervals created by our model correctly contained the true value `r round(mean(cvg) * 100, 1)`% of the time (based on the model’s mean coverage value). Considering how the intervals were set to contain the true value 95% of the time, a `r round(mean(cvg) * 100, 1)`% coverage rate is extremely acceptable. Similarly, the mean RPMSE was `r round(mean(rpmse), 3)`. This value represents how far off our predictions were on average from the true values. Considering that it’s less than a single percentage point, our model accurately predicts a student’s final exam score by within a percent on average. 
+
 # Hypothesis Testing and Confidence Intervals under Heteroskedasticity
 
-# RESEARCH Q 1: Effect of activites? Everything is significant except for Quiz
+# RESEARCH Q 1: Effect of activites? 
+
+Onle exam 2 and 3 are significant
 
 ```{r}
 coef(ped.gls)
@@ -299,13 +311,13 @@ Historically, were there any semesters that had either better or worse student l
 Does semester1=semester2=....=semester10? Hypothesis test...
 
 ```{r}
-final_avg <- mean(ped$Final)
-
-ped %>%
-  group_by(Semester) %>%
-  summarize("SemesterAvg"=mean(Final), "Difference"=final_avg-SemesterAvg)
-
-
+# final_avg <- mean(ped$Final)
+# 
+# ped %>%
+#   group_by(Semester) %>%
+#   summarize("SemesterAvg"=mean(Final), "Difference"=final_avg-SemesterAvg)
+# 
+# 
 
 ```
 

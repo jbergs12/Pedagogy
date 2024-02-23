@@ -1,0 +1,24 @@
+---
+title: "report"
+author: "Aaron Oustrich,"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+# knitr::opts_chunk$set(echo = TRUE)
+
+source("pedagogy_exam_analysis.qmd")
+```
+
+# Section 0
+
+# Section 1
+
+To maximize student learning, curriculum creators and college instructors develop instruction to help students master the given content. This instruction should include meaningful learning activities that help the students progress. In this study, a statistics department gathered data on the performance of the students in their introductory statistics course for the most recent 5 academic years (excluding summer semesters). The goal of this analysis is to assess if the semester learning activities are associated with mastering the given content, which said mastery is measured by the final exam score. Specifically, we seek to know if there are any activities associated or not associated, of those associated which have the strongest effect, how well class activities model student learning, and if there were any semesters that had either better or worse learning than average. The variables include:
+
+# Section 2
+
+The multiple linear regression model is based on the equation $\mathbf{y} = \mathbf{X}\mathbf{\beta} + \mathbf{\epsilon}$. However, due to heteroskedasticity in the model, the response vector follows $\mathbf{y} \sim \text{MVN}(\mathbf{X\beta},\mathbf{D})$ where the diagonal values ($d_{ii}$) of matrix $\mathbf{D}$ are equal to the inverse of the number of students in each class $\left(\frac{1}{\text{NStudents}_i}\right)$, and the off-diagonal values are all 0s. In our model, $\mathbf{y}$ is a vector of average scores (in percent) on the final exam. $\mathbf{X}$ is the matrix of explanatory variables including a column of 1s for the intercept, and columns for each of the 10 different semesters, number of students in a given course section, the classes' average exam scores for the 1st, 2nd, and 3rd midterms, average homework scores, and average quiz scores. $\mathbf{\beta}$ is the vector of the intercept value and coefficient values. The coefficient values in $\mathbf{\beta}$ represent the relationship between the explanatory variables and the response variable. Finally, $\mathbf{\epsilon}$ is the vector of error terms of each observation and follows $\mathbf{\epsilon} \sim \text{MVN}(0,\mathbf{D})$.
+
+This model must meet four different assumptions in order to be used. First, the observations must have a linear relationship with the predictors (they roughly follow a line when plotted against one another). Next, the responses must be independent of one another (the average final score of one section cannot depend on the average final score of another). Then, the residuals of the responses must follow an approximately normal distribution. Finally, there must be equal variance among the responses. This model (as currently specified) ensures equal variance.
