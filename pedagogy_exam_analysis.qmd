@@ -43,18 +43,18 @@ ped$Semester <- as.factor(ped$Semester)
 
 ```{r, fig.width=9, fig.height=3}
 # Scatterplot for Exam2
-plot_exam3 <- ggplot(ped, aes(x = Exam3, y = Final, color = Semester)) +
+plot_exam3 <- ggplot(ped, aes(x = Exam3, y = Final)) +
   geom_point() +
   labs(title = "Exam3 and Final Exam Score") +
   theme(plot.margin = margin(0.5, 0.5, 0.5, 0.5, "cm"))
 
-plot_exam2 <- ggplot(ped, aes(x = Exam2, y = Final, color = Semester)) +
+plot_exam2 <- ggplot(ped, aes(x = Exam2, y = Final)) +
   geom_point() +
   labs(title = "Exam2 and Final Exam Score") +
   theme(plot.margin = margin(0.5, 0.5, 0.5, 0.5, "cm"))
 
 # Scatterplot for Exam1
-plot_exam1 <- ggplot(ped, aes(x = Exam1, y = Final, color = Semester)) +
+plot_exam1 <- ggplot(ped, aes(x = Exam1, y = Final)) +
   geom_point() +
   labs(title = "Exam1 and Final Exam Score") +
   theme(plot.margin = margin(0.5, 0.5, 0.5, 0.5, "cm"))
