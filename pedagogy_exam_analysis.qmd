@@ -39,6 +39,33 @@ ped <- vroom("ClassAssessment.txt")
 ped$Semester <- as.factor(ped$Semester)
 ```
 
+
+
+```{r, fig.width=9, fig.height=3}
+# Scatterplot for Exam2
+plot_exam3 <- ggplot(ped, aes(x = Exam3, y = Final, color = Semester)) +
+  geom_point() +
+  labs(title = "Exam3 and Final Exam Score") +
+  theme(plot.margin = margin(0.5, 0.5, 0.5, 0.5, "cm"))
+
+plot_exam2 <- ggplot(ped, aes(x = Exam2, y = Final, color = Semester)) +
+  geom_point() +
+  labs(title = "Exam2 and Final Exam Score") +
+  theme(plot.margin = margin(0.5, 0.5, 0.5, 0.5, "cm"))
+
+# Scatterplot for Exam1
+plot_exam1 <- ggplot(ped, aes(x = Exam1, y = Final, color = Semester)) +
+  geom_point() +
+  labs(title = "Exam1 and Final Exam Score") +
+  theme(plot.margin = margin(0.5, 0.5, 0.5, 0.5, "cm"))
+
+# Remove legend from Exam2 and Exam1 plots
+plot_exam2 <- plot_exam2 + theme(legend.position = "none")
+plot_exam1 <- plot_exam1 + theme(legend.position = "none")
+plot_exam3 <- plot_exam3 + theme(legend.position = "none")
+gridExtra::grid.arrange(plot_exam1, plot_exam2, plot_exam3, nrow = 1)
+```
+
 ```{r}
 summary(ped)
 knitr::kable(summary(ped), align = "l", format = "markdown")
@@ -53,17 +80,11 @@ ped |>
   geom_boxplot(aes(x = Semester))
 
 ## It appeared that as Exam 3 avg scores increased, avg Final Grades increased
- 
-ped |> 
-  ggplot(aes(y = Final)) +
-  geom_point(aes(x = Exam3, color = Semester))
-ped |> 
-  ggplot(aes(y = Final)) +
-  geom_point(aes(x = Exam2, color = Semester))
-ped |> 
-  ggplot(aes(y = Final)) +
-  geom_point(aes(x = Exam1, color = Semester))
+
+
+
 ```
+
 
 
 # Basic lm model
