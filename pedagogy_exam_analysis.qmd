@@ -71,7 +71,6 @@ ped |>
 ```{r}
 ped.lm <- lm(Final ~ .  , data = ped)
 summary(ped.lm)
-
 ```
 
 ```{r message=FALSE}
@@ -96,16 +95,50 @@ ped.gls <- gls(model=Final~. ,
     weights=varFixed(~1/NStudents),
     method="ML")
 
+# summary(ped.gls.full)
+
+
+# ped.gls <- gls(model= Final ~ Exam1 +Exam2 + Exam3 + HW + Quiz,
+#     data=ped,
+#     weights=varFixed(~1/NStudents),
+#     method="ML")
+# 
 summary(ped.gls)
 ```
+
+```{r}
+# ped.gls.int <- gls(model=Final~  Exam1 + Exam2 + Exam3 + Semester:HW + Semester:Quiz ,
+#     data=ped,
+#     weights=varFixed(~1/NStudents),
+#     method="ML")
+# 
+# anova(ped.gls, ped.gls.int)
+# 
+# summary(ped.gls.int)
+```
+
+
 
 # GLS assumptions
 
 ### Linearity
 
 ```{r}
-car::avPlots(ped.lm)
+# all_avplots <- car::avPlots(ped.lm)
+# 
+# avexam3 <- all_avplots$Exam3
+
+# car::avPlots(ped.lm, subset = c(5))
+car::avPlot(ped.lm, "Exam3")
+
 ```
+
+```{r}
+plot(avexam3)
+abline(lm(avexam3$y ~ avexam3$x), col = "blue")
+
+```
+
 
 The only added-variable plot between Income and EatingOut appears linear. This assumption is met.
 
@@ -144,7 +177,7 @@ ggplot(data = data.frame(residual = resid(ped.gls, type="pearson")),
 ```
 
 ```{r}
-lmtest::bptest((resid(ped.gls, type="pearson"))^2 ~ fitted(ped.gls))
+# lmtest::bptest((resid(ped.gls, type="pearson"))^2 ~ fitted(ped.gls))
 ```
 
 The BP-test outputs a large p-value, and the scatter plot of fitted v. standardized residuals appears to have constant variance. This assumption is now met.
@@ -172,7 +205,7 @@ for(i in 1:n){
   train.set <- ped[-i,]
   
   ## Fit a lm() using the training data
-  train.gls <- gls(model=Final~. ,
+  train.gls <- gls(model=Final ~. ,
     data=train.set,
     weights=varFixed(~1/NStudents),
     method="ML")
@@ -258,9 +291,9 @@ ggplot() +
 
 
 ```{r}
-final_rmse <- mean(sum((dataPreds$Prediction - ped$Final)^2))
+final_rmse <- sqrt(mean((dataPreds$Prediction - ped$Final)^2))
+final_rmse  # .3557
 
-# try MAE?
 ```
 
 
@@ -287,10 +320,22 @@ IT appears that the significant factors are Exam 3 and Exam 2.
 *Carry out a hypothesis test that beta_Quiz=0 . Carry out a hypothesis test that beta_HW=0 Report the p -value and draw an appropriate conclusion.*
 
 ```{r}
-a <- matrix(c(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1), nrow=1)
-summary(multcomp::glht(ped.gls, linfct=a, rhs=0))
+quiz <- matrix(c(0, #intercept
+              0,0,0,0,0,0,0,0,0, # semesters baseline 1
+              0, # n students
+              0,0,0, #exams
+              0, #hw
+              1#quiz
+              ), nrow=1)
+summary(multcomp::glht(ped.gls, linfct=quiz, rhs=0))
 
-hw <- matrix(c(0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0), nrow=1)
+hw <- matrix(c(0, #intercept
+              0,0,0,0,0,0,0,0,0, # semesters baseline 1
+              0, # n students
+              0,0,0, #exams
+              1, #hw
+              0#quiz
+              ),nrow=1)
 summary(multcomp::glht(ped.gls, linfct=hw, rhs=0))
 ```
 
@@ -300,8 +345,8 @@ Construct a 95% confidence interval for beta_Exam3 and beta_Exam2.
 
 ```{r}
 confint(ped.gls, level = 0.95)
-confint(ped.gls, level = 0.95)[13,] ## Exam 2
-confint(ped.gls, level = 0.95)[14,] ## Exam 3
+# confint(ped.gls, level = 0.95)[13,] ## Exam 2
+# confint(ped.gls, level = 0.95)[14,] ## Exam 3
 ```
 
 ## RESEARCH Q NUM 4:
